@@ -1,0 +1,21 @@
+agent: train() -> step() -> _run_one_training_iteration() -> training_step() ->
+-> train_one_step() -> do_minibatch_sgd() -> learn_on_batch() -> learn_on_batch() ->
+-> compute_gradients의 grads도 return, apply_gradients 닫기,
+-> compute_gradients() -> _multi_gpu_parallel_grad_calc() -> loss()
+
+
+train(): ray/tune/trainable/trainable.py
+step(): ray/rllib/algorithms/algorithm.py
+_run_one_training_iteration(): ray/rllib/algorithms/algorithm.py
+training_step(): ray/rllib/algorithms/ppo/ppo.py
+train_one_step(): ray/rllib/execution/tarin_ops.py
+do_minibatch_sgd(): ray/rllib/utils/sgd.py
+learn_on_batch(): ray/rllib/evaluation/rollout_worker.py
+learn_on_batch(): ray/rllib/policy/torch_policy_v2.py
+apply_gradients(): ray/rllib/policy/torch_policy_v2.py
+compute_gradients(): ray/rllib/policy/torch_policy_v2.py
+_multi_gpu_parallel_grad_calc(): ray/rllib/policy/torch_policy_v2.py
+
+
+
+step() 에서 evaluation 중간중간 진행할거냐 말거냐
