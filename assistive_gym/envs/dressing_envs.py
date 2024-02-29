@@ -10,7 +10,7 @@ from .agents.human import Human
 from ray.rllib.env.multi_agent_env import MultiAgentEnv
 from ray.tune.registry import register_env
 
-robot_arm = 'left'
+robot_arm = 'right'
 human_controllable_joint_indices = human.left_arm_joints
 class DressingPR2Env(DressingEnv):
     def __init__(self):
