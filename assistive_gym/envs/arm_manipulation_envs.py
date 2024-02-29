@@ -10,7 +10,7 @@ from .agents.human import Human
 from ray.rllib.env.multi_agent_env import MultiAgentEnv
 from ray.tune.registry import register_env
 
-robot_arm = 'both'
+robot_arm = 'right'
 human_controllable_joint_indices = human.right_arm_joints
 class ArmManipulationPR2Env(ArmManipulationEnv):
     def __init__(self):
