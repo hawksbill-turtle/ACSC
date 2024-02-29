@@ -7,7 +7,7 @@ from .agents.furniture import Furniture
 
 class FeedingEnv(AssistiveEnv):
     def __init__(self, robot, human):
-        super(FeedingEnv, self).__init__(robot=robot, human=human, task='feeding', obs_robot_len=(33 + len(robot.controllable_joint_indices) - (len(robot.wheel_joint_indices) if robot.mobile else 0)), obs_human_len=(34 + len(human.controllable_joint_indices)))
+        super(FeedingEnv, self).__init__(robot=robot, human=human, task='feeding', obs_robot_len=(18 + len(robot.controllable_joint_indices) - (len(robot.wheel_joint_indices) if robot.mobile else 0)), obs_human_len=(19 + len(human.controllable_joint_indices)))
 
     def step(self, action):
         if self.human.controllable:
@@ -92,21 +92,11 @@ class FeedingEnv(AssistiveEnv):
             # Don't include joint angles for the wheels
             robot_joint_angles = robot_joint_angles[len(self.robot.wheel_joint_indices):]
         head_pos, head_orient = self.human.get_pos_orient(self.human.head)
-        shoulder_pos = self.human.get_pos_orient(self.human.right_shoulder)[0]
-        elbow_pos = self.human.get_pos_orient(self.human.right_elbow)[0]
-        wrist_pos = self.human.get_pos_orient(self.human.right_wrist)[0]
-        stomach_pos = self.human.get_pos_orient(self.human.stomach)[0]
-        waist_pos = self.human.get_pos_orient(self.human.waist)[0]
         head_pos_real, head_orient_real = self.robot.convert_to_realworld(head_pos, head_orient)
-        shoulder_pos_real, _ = self.robot.convert_to_realworld(shoulder_pos)
-        elbow_pos_real, _ = self.robot.convert_to_realworld(elbow_pos)
-        wrist_pos_real, _ = self.robot.convert_to_realworld(wrist_pos)
-        stomach_pos_real, _ = self.robot.convert_to_realworld(stomach_pos)
-        waist_pos_real, _ = self.robot.convert_to_realworld(waist_pos)
         target_pos_real, _ = self.robot.convert_to_realworld(self.target_pos)
         self.robot_force_on_human, self.spoon_force_on_human = self.get_total_force()
         self.total_force_on_human = self.robot_force_on_human + self.spoon_force_on_human
-        robot_obs = np.concatenate([spoon_pos_real, spoon_orient_real, target_pos_real, robot_joint_angles, head_pos_real, head_orient_real, shoulder_pos_real, elbow_pos_real, wrist_pos_real, stomach_pos_real, waist_pos_real, [self.spoon_force_on_human]]).ravel()
+        robot_obs = np.concatenate([spoon_pos_real, spoon_orient_real, spoon_pos_real - target_pos_real, robot_joint_angles, head_pos_real, head_orient_real, [self.spoon_force_on_human]]).ravel()
         if agent == 'robot':
             return robot_obs
         if self.human.controllable:

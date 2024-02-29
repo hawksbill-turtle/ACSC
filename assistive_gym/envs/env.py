@@ -261,10 +261,12 @@ class AssistiveEnv(gym.Env):
         # --- Arm Manipulation ---
         # Penalty for applying large pressure to the person (high forces over small surface areas)
         if self.task == 'arm_manipulation':
-            tool_contact_points = len(self.tool.get_closest_points(self.human, distance=0.01)[-1])
-            tool_pressure = 0 if tool_contact_points <= 0 else (arm_manipulation_tool_forces_on_human[0] / tool_contact_points)
+            tool_right_contact_points = len(self.tool_right.get_closest_points(self.human, distance=0.01)[-1])
+            tool_left_contact_points = len(self.tool_left.get_closest_points(self.human, distance=0.01)[-1])
+            tool_right_pressure = 0 if tool_right_contact_points <= 0 else (arm_manipulation_tool_forces_on_human[0] / tool_right_contact_points)
+            tool_left_pressure = 0 if tool_left_contact_points <= 0 else (arm_manipulation_tool_forces_on_human[1] / tool_left_contact_points)
 
-            reward_arm_manipulation_tool_pressures = -tool_pressure
+            reward_arm_manipulation_tool_pressures = -(tool_right_pressure + tool_left_pressure)
             reward_force_nontarget = -(arm_manipulation_total_force_on_human - np.sum(arm_manipulation_tool_forces_on_human))
         else:
             reward_arm_manipulation_tool_pressures = 0.0

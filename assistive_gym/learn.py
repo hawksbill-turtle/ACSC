@@ -321,7 +321,7 @@ if __name__ == '__main__':
                         help='ACSC loss coefficient')
     parser.add_argument('--save-memory', action='store_true', default=False,
                         help='Whether to save memory')
-    parser.add_argument('--load-memory', action='store_true', default=False,
+    parser.add_argument('--load-memory', action='store_true', default=True,
                         help='Whether to load memory')
     parser.add_argument('--memory-root', default='./memory',
                         help='Where to save memory')
