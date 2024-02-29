@@ -5,7 +5,7 @@ from .env import AssistiveEnv
 
 class DrinkingEnv(AssistiveEnv):
     def __init__(self, robot, human):
-        super(DrinkingEnv, self).__init__(robot=robot, human=human, task='drinking', obs_robot_len=(18 + len(robot.controllable_joint_indices) - (len(robot.wheel_joint_indices) if robot.mobile else 0)), obs_human_len=(19 + len(human.controllable_joint_indices)))
+        super(DrinkingEnv, self).__init__(robot=robot, human=human, task='drinking', obs_robot_len=(33 + len(robot.controllable_joint_indices) - (len(robot.wheel_joint_indices) if robot.mobile else 0)), obs_human_len=(34 + len(human.controllable_joint_indices)))
 
     def step(self, action):
         if self.human.controllable:
@@ -100,11 +100,21 @@ class DrinkingEnv(AssistiveEnv):
             # Don't include joint angles for the wheels
             robot_joint_angles = robot_joint_angles[len(self.robot.wheel_joint_indices):]
         head_pos, head_orient = self.human.get_pos_orient(self.human.head)
+        shoulder_pos = self.human.get_pos_orient(self.human.right_shoulder)[0]
+        elbow_pos = self.human.get_pos_orient(self.human.right_elbow)[0]
+        wrist_pos = self.human.get_pos_orient(self.human.right_wrist)[0]
+        stomach_pos = self.human.get_pos_orient(self.human.stomach)[0]
+        waist_pos = self.human.get_pos_orient(self.human.waist)[0]
         head_pos_real, head_orient_real = self.robot.convert_to_realworld(head_pos, head_orient)
+        shoulder_pos_real, _ = self.robot.convert_to_realworld(shoulder_pos)
+        elbow_pos_real, _ = self.robot.convert_to_realworld(elbow_pos)
+        wrist_pos_real, _ = self.robot.convert_to_realworld(wrist_pos)
+        stomach_pos_real, _ = self.robot.convert_to_realworld(stomach_pos)
+        waist_pos_real, _ = self.robot.convert_to_realworld(waist_pos)
         target_pos_real, _ = self.robot.convert_to_realworld(self.target_pos)
         self.robot_force_on_human, self.cup_force_on_human = self.get_total_force()
         self.total_force_on_human = self.robot_force_on_human + self.cup_force_on_human
-        robot_obs = np.concatenate([cup_pos_real, cup_orient_real, cup_pos_real - target_pos_real, robot_joint_angles, head_pos_real, head_orient_real, [self.cup_force_on_human]]).ravel()
+        robot_obs = np.concatenate([cup_pos_real, cup_orient_real, target_pos_real, robot_joint_angles, head_pos_real, head_orient_real, shoulder_pos_real, elbow_pos_real, wrist_pos_real, stomach_pos_real, waist_pos_real, [self.cup_force_on_human]]).ravel()
         if agent == 'robot':
             return robot_obs
         if self.human.controllable:
@@ -129,7 +139,7 @@ class DrinkingEnv(AssistiveEnv):
         # Update robot and human motor gains
         self.robot.motor_gains = self.human.motor_gains = 0.005
 
-        joints_positions = [(self.human.j_right_elbow, -90), (self.human.j_left_elbow, -90), (self.human.j_right_hip_x, -90), (self.human.j_right_knee, 80), (self.human.j_left_hip_x, -90), (self.human.j_left_knee, 80)]
+        joints_positions = [(self.human.j_right_shoulder_x, 20), (self.human.j_left_shoulder_x, -20), (self.human.j_right_elbow, -90), (self.human.j_left_elbow, -90), (self.human.j_right_hip_x, -90), (self.human.j_right_knee, 80), (self.human.j_left_hip_x, -90), (self.human.j_left_knee, 80)]
         joints_positions += [(self.human.j_head_x, self.np_random.uniform(-30, 30)), (self.human.j_head_y, self.np_random.uniform(-30, 30)), (self.human.j_head_z, self.np_random.uniform(-30, 30))]
         self.human.setup_joints(joints_positions, use_static_joints=True, reactive_force=None)
 
