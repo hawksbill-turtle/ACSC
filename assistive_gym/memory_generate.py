@@ -184,6 +184,9 @@ if __name__ == '__main__':
     save_memory = args.save_memory
     memory_root = args.memory_root
     save_memory_len = args.save_memory_len
+    
+    if not os.path.exists(memory_root):
+        os.mkdir(memory_root)
 
     ray.init(num_cpus=multiprocessing.cpu_count(), ignore_reinit_error=True, log_to_driver=False)
 
